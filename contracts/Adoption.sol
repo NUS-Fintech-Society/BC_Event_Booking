@@ -6,18 +6,23 @@ contract Adoption {
     uint _value
   );
 
-  address[16] public adopters;
-  mapping (string => Item) items;
-
   struct Item {
     string name;
     uint tickets;
     mapping(address => uint) owners;
   }
 
+  address[16] public adopters;
+  string[] public itemIdList;
+  uint public counter;
+  mapping (string => Item) items;
+
+
   function buyItem(string memory itemId, uint numOfTickets) public payable returns (uint) {
+    emit Deposit(items[itemId].owners[msg.sender]+numOfTickets);
     items[itemId].owners[msg.sender] = items[itemId].owners[msg.sender]+numOfTickets;
-    emit Deposit(items[itemId].owners[msg.sender]);
+    items[itemId].tickets = items[itemId].tickets - numOfTickets;
+    emit Deposit(items[itemId].tickets);
     return items[itemId].owners[msg.sender];
   }
 
@@ -27,14 +32,47 @@ contract Adoption {
     i.tickets = _tickets;
     items[itemId] = i;
     items[itemId].owners[msg.sender] = 0;
+    itemIdList.push(itemId);
+    counter++;
     emit Deposit(items[itemId].owners[msg.sender]);
     return items[itemId].tickets;
   }
 
   function checkItem(string memory itemId) public view returns (uint) {
     uint ownedTickets = items[itemId].owners[msg.sender];
-    /* emit Deposit(ownedTickets); */
     return ownedTickets;
+  }
+
+  function checkAvailability(string memory itemId) public view returns (uint) {
+    uint availableTickets = items[itemId].tickets;
+    return availableTickets;
+  }
+
+  function initialFunction() public view returns (bytes32[] memory,bytes32[] memory,uint[] memory) {
+    bytes32[] memory nameList = new bytes32[](counter);
+    bytes32[] memory idList = new bytes32[](counter);
+    uint[] memory ticketList = new uint[](counter);
+    for (uint i = 0; i < itemIdList.length; i++) {
+      if (keccak256(abi.encodePacked(itemIdList[i])) == keccak256(abi.encodePacked("-1"))) { //deleted value is -1
+        continue;
+      }
+      string memory currentId = itemIdList[i];
+      Item memory currentItem = items[currentId];
+      nameList[i] = stringToBytes32(currentItem.name);
+      idList[i] = stringToBytes32(itemIdList[i]);
+      ticketList[i] = currentItem.tickets;
+    }
+    return (nameList, idList, ticketList);
+  }
+
+  function stringToBytes32(string memory source) public pure returns (bytes32 result) {
+    bytes memory tempEmptyStringTest = bytes(source);
+    if (tempEmptyStringTest.length == 0) {
+        return 0x0;
+    }
+    assembly {
+        result := mload(add(source, 32))
+    }
   }
 
   // Adopting a pet
