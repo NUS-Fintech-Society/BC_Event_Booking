@@ -43,7 +43,6 @@ App = {
     $(document).on('click', '.btn-create', App.createItem);
     $(document).on('click', '.btn-check', App.checkItem);
     $(document).on('click', '.btn-init', App.initEvents);
-    // await App.initEvents();
   },
 
   initEvents: async function() {
@@ -119,6 +118,16 @@ App = {
     var location = document.getElementById("location").value;
     var date = document.getElementById("date").value;
     var price = document.getElementById("price").value;
+    if (name==""||numOfTickets==""||location==""||date==""||price=="") {
+      alert("No field can be empty.");
+      return
+    }
+    var givenDate = new Date(date);
+    var todayDate = new Date();
+    if(givenDate<todayDate) {
+      alert("Date of event cannot be in the past.");
+      return;
+    }
     var accounts = web3.eth.getAccounts;
     var account = accounts[0]
     var contract = await App.contracts.Adoption.deployed();
@@ -167,12 +176,42 @@ App = {
   		str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
   	}
   	return str;
+  },
+
+  validateName: function(event) {
+    // console.log("validateName called")
+    var form = document.getElementById('form');
+    var event_name = document.getElementById('event_name');
+      if (!(/^[\x00-\x7F]{0,32}$/.test(event_name.value))) {
+        console.log("event_name is not matching the regex");
+        event_name.setCustomValidity('Please ensure you only use at most 32 ASCII characters.');
+        event_name.reportValidity();
+      } else {
+        event_name.setCustomValidity('');
+        event_name.reportValidity();
+      };
+  },
+
+  validateId: function(event) {
+    // console.log("validateName called")
+    var form = document.getElementById('form');
+    var idToBeChecked = document.getElementById('idToBeChecked');
+      if (!(/^[a-zA-Z0-9]{32}$/.test(idToBeChecked.value))) {
+        console.log("ID is a 32 character alphanumeric phrase.");
+        idToBeChecked.setCustomValidity("ID is a 32 character alphanumeric phrase.");
+        idToBeChecked.reportValidity();
+      } else {
+        idToBeChecked.setCustomValidity('');
+        idToBeChecked.reportValidity();
+      };
   }
 
 };
 
 $(function() {
   $(window).load(function() {
+    var today = new Date().toISOString().split('T')[0];
+    document.getElementById("date").setAttribute('min', today);
     App.init();
   });
 });
