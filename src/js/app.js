@@ -102,7 +102,12 @@ App = {
     if (ticketsAvailable < numOfTickets) {
       alert("There is not enough tickets available");
       return;
-  }
+    }
+    var r = contract.With();
+    r.watch(function(error, result){
+      console.log("msg.sender: "+result.args._add);
+      r.stopWatching();
+    });
     await contract.buyItem( itemId, numOfTickets, {from:account, value:totalPrice*(10**18)});
     var ticketId = "ticket"+ itemId;
     document.getElementById(ticketId).innerHTML = ticketsAvailable-numOfTickets;
@@ -132,9 +137,14 @@ App = {
     var account = accounts[0]
     var contract = await App.contracts.Adoption.deployed();
     var r = contract.Deposit();
+    var s = contract.With();
     r.watch(function(error, result){
       console.log("createItem()=> items[itemId].owners[msg.sender]: "+result.args._value);
       r.stopWatching();
+    });
+    s.watch(function(error, result){
+      console.log("Creator: "+result.args._add);
+      s.stopWatching();
     });
     await contract.createItem( itemId, name, numOfTickets, {from:account});
     var petTemplate = $('#petTemplate');

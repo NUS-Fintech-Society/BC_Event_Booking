@@ -64,6 +64,11 @@ contract TestAdoption {
    Assert.equal(returnedAvailableTickets, remainingTickets, "Adoption of the expected pet should match what is returned.");
  }
 
+ function testGetCreator() public {
+   address returnedCreator = adoption.getCreator(expectedPetId);
+   Assert.equal(returnedCreator, expectedAdopter, "Adoption of the expected pet should match what is returned.");
+ }
+
  function testInitialFunction() public {
    (bytes32[] memory names, bytes32[] memory id, uint[] memory tickets) = adoption.initialFunction();
    bytes32 returnedBytesName= names[0];
