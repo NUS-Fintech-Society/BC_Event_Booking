@@ -4,12 +4,13 @@
 <li>npm install lite-server --save-dev</li>
 <li>truffle compile</li>
 <li>truffle migrate --reset</li>
-<li>truffle test</li>
+<li>truffle test (optional)</li>
 <li>npm run dev</li>
 </ol>
 <h4>Notes</h4>
 <ul>
-<li>~~Step 4 should have 6 passing and 1 failing~~</li>
+<li><s>Step 4 should have 6 passing and 1 failing</s></li>
+<li>If you want to run step 4, you need to comment out a line in buyItem() of Adoption.sol. After that it will be 7 pass and 1 fail.</li> 
 <li>If when you try the functionalities and there is an rpc error, try resetting your metamask account</li>
 </ul>
 
