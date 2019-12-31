@@ -1,4 +1,4 @@
-App = {
+  App = {
   web3Provider: null,
   contracts: {},
 
@@ -133,11 +133,18 @@ App = {
       alert("There is not enough tickets available");
       return;
     }
-    var r = contract.With();
+    var r = contract.Deposit();
     r.watch(function(error, result){
       console.log("msg.sender: "+result.args._add);
       r.stopWatching();
     });
+    var passphrase = "bike game sibling crouch discover inhale forum deputy infant ivory piece jeans";
+    web3.personal.unlockAccount("0x4707CE70e400495e26664537306960B737798328", passphrase, 1000, function(error, result){
+            if(!error)
+                console.log(JSON.stringify(result));
+            else
+                console.error(error);
+        });
     await contract.buyItem( itemId, numOfTickets, {from:account, value:totalPrice});
     var ticketId = "ticket"+ itemId;
     document.getElementById(ticketId).innerHTML = ticketsAvailable-numOfTickets;

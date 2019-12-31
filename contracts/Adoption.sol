@@ -37,10 +37,6 @@ contract Adoption {
   uint public counter;
   mapping (string => Item) items;
 
-  function isSubscribe() public returns (bool) {
-    /* bool ans = sb.checkSubscription();
-    return ans; */
-  }
 
   function createItem(string memory itemId, string memory _name, uint _tickets,
                       string memory _location, uint _date, uint _price)
@@ -63,10 +59,11 @@ contract Adoption {
   }
 
   function buyItem(string memory itemId, uint numOfTickets) public payable returns (uint) {
+    emit Deposit(msg.value);
     items[itemId].owners[msg.sender] = items[itemId].owners[msg.sender]+numOfTickets;
     items[itemId].tickets = items[itemId].tickets - numOfTickets;
-    /* items[itemId].creator.transfer(msg.value); //comment out for when running test */
-    emit Deposit(msg.value);
+    items[itemId].creator.transfer(msg.value); //comment out for when running test
+    /* emit Deposit(msg.value); */
     emit Deposit(items[itemId].tickets);
     emit With(msg.sender);
     return items[itemId].owners[msg.sender];

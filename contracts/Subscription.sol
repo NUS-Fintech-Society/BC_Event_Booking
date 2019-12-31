@@ -18,10 +18,11 @@ contract Subscription {
       person[msg.sender] = person[msg.sender] + (1 * numOfMonths);
     }
   }
-/* 2592000 */
+/* 2592000s = 1 month. Replace the 1 in line 16 and 18 with this to represent subbing for 1 month*/
 
   function fake() public {
-
+    /*to ensure the block's time stamp is representative of current time*/
+    /*called in app.js buyItem()*/
   }
 
   function checkSubscription() public view returns(bool) {
