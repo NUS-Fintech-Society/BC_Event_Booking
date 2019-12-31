@@ -1,0 +1,44 @@
+  <!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <link rel="stylesheet" href="styles.css">
+    <title>John's Ticket Shop</title>
+    <!-- Bootstrap -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <a href="index.html">Back</a>
+  </head>
+  <body>
+    <div>
+      <table class="paleBlueRows">
+        <thead>
+          <tr>
+            <th>Cost per month</th><th>Period of Time</th><th>Purchase</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1 ether</td><td>1 month</td><td><button id="1" onClick="App.subscribe(this.id)">1 ether</button></td>
+          </tr>
+          <tr>
+            <td>0.5 ether</td><td>3 months</td><td><button id="3" onClick="App.subscribe(this.id)">1.5 ether</button></td>
+          </tr>
+          <tr>
+            <td>0.25 ether</td><td>12 months</td><td><button id="12" onClick="App.subscribe(this.id)">3 ether</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <input value="Check your current sub" type="button" class="btn btn-default btn-check">
+    </div>
+    <div id="ResultOfSubCheck"></div>
+    <script src="js/web3.min.js"></script>
+    <script src="js/truffle-contract.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="js/app2.js"></script>
+  </body>
+</html>

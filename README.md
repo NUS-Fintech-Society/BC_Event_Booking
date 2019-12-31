@@ -9,7 +9,7 @@
 </ol>
 <h4>Notes</h4>
 <ul>
-<li>Step 4 should have 6 passing and 1 failing</li>
+<li>~~Step 4 should have 6 passing and 1 failing~~</li>
 <li>If when you try the functionalities and there is an rpc error, try resetting your metamask account</li>
 </ul>
 

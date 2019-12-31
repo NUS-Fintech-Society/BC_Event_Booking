@@ -35,6 +35,13 @@ App = {
       App.contracts.Adoption.setProvider(App.web3Provider);// Set the provider for our contract
       // return App.markAdopted();// Use our contract to retrieve and mark the adopted pets
     });
+    $.getJSON('Subscription.json', function(data) {
+      // Get the necessary contract artifact file and instantiate it with truffle-contract
+      var AdoptionArtifact = data;
+      App.contracts.Subscription = TruffleContract(AdoptionArtifact);
+      App.contracts.Subscription.setProvider(App.web3Provider);// Set the provider for our contract
+      // return App.markAdopted();// Use our contract to retrieve and mark the adopted pets
+    });
     return App.bindEvents();
   },
 
@@ -48,19 +55,30 @@ App = {
   initEvents: async function() {
     var account = web3.eth.getAccounts[0];
     var contract = await App.contracts.Adoption.deployed();
+    // var r = contract.Deposit();
+    // r.watch(function(error, result){
+    //   console.log("msg.sender: "+result.args._value);
+    //   // r.stopWatching();
+    // });
     var g = await contract.initialFunction({from:account});
+    console.log(g);
     var petTemplate = $('#petTemplate');
     var petsRow = $('#petsRow');
     for (var i = 0; i < g[0].length; i++) {
       var name = g[0][i];
       var id = g[1][i];
       var tickets = g[2][i];
+      var location = g[3][i];
+      var date = g[4][i];
+      var price = g[5][i];
       name = name.replace("0x","");
       name = App.hexStringToString(name);
       id = id.replace("0x","");
       id = App.hexStringToString(id);
       tickets = tickets["c"][0];
-
+      location = location.replace("0x","");
+      location = App.hexStringToString(location);
+      date = date["c"][0];
       var newTicketId = "ticket"+ id;
       if (document.getElementById(newTicketId) !== null) {
         continue;
@@ -70,9 +88,9 @@ App = {
       petTemplate.find('.pet-age').text(tickets);
       var newTicketId = "ticket"+ id;
       petTemplate.find('.pet-age').attr('id', newTicketId);
-      petTemplate.find('.pet-location').text("not stored");
-      petTemplate.find('.pet-date').text("not stored");
-      petTemplate.find('.pet-price').text("not stored");
+      petTemplate.find('.pet-location').text(location);
+      petTemplate.find('.pet-date').text(date);
+      petTemplate.find('.pet-price').text(price.toString());
       var newPriceId = "price"+ id;
       petTemplate.find('.pet-price').attr('id', newPriceId);
       petTemplate.find('.btn-adopt').attr('data-id',  id);
@@ -89,16 +107,28 @@ App = {
     var  itemId = $(event.target).data('id');
     var quantityId = "quantity"+ itemId;
     var numOfTickets = document.getElementById(quantityId).value;
-    var priceId = "price"+ itemId;
-    var price = document.getElementById(priceId).innerHTML;
-    var totalPrice = price * numOfTickets;
-    console.log("Total Price: "+totalPrice);
     var accounts = web3.eth.getAccounts;
     var account = accounts[0]
     var contract = await App.contracts.Adoption.deployed();
+    var contract2 = await App.contracts.Subscription.deployed();
+    var priceId = "price"+ itemId;
+    var price = document.getElementById(priceId).innerHTML;
+    var totalPrice = price * numOfTickets;
+    await contract2.fake({from:account});
+    var isSubscriber = await contract2.checkSubscription({from:account});
+    console.log("Staus of sub: " + isSubscriber);
+    var r = contract.Draw();
+    r.watch(function(error, result){
+      console.log("msg.sender: "+result.args._value);
+      r.stopWatching();
+    });
+    if (isSubscriber) {
+      totalPrice = Math.floor(totalPrice * 0.9) ;
+      console.log("Price has been reduced");
+    }
+    console.log("Total Price: "+totalPrice);
     var ticketsAvailable = await contract.checkAvailability(itemId,{from:account});
     console.log("ticketsAvailable: "+ticketsAvailable+" and numOfTickets: "+numOfTickets);
-    console.log("ticketsAvailable < numOfTickets: "+(ticketsAvailable < numOfTickets));
     if (ticketsAvailable < numOfTickets) {
       alert("There is not enough tickets available");
       return;
@@ -108,7 +138,7 @@ App = {
       console.log("msg.sender: "+result.args._add);
       r.stopWatching();
     });
-    await contract.buyItem( itemId, numOfTickets, {from:account, value:totalPrice*(10**18)});
+    await contract.buyItem( itemId, numOfTickets, {from:account, value:totalPrice});
     var ticketId = "ticket"+ itemId;
     document.getElementById(ticketId).innerHTML = ticketsAvailable-numOfTickets;
   },
@@ -122,6 +152,7 @@ App = {
     var numOfTickets = document.getElementById("numOfTickets").value;
     var location = document.getElementById("location").value;
     var date = document.getElementById("date").value;
+    var dateId = date.replace(/-/g,"");
     var price = document.getElementById("price").value;
     if (name==""||numOfTickets==""||location==""||date==""||price=="") {
       alert("No field can be empty.");
@@ -146,7 +177,7 @@ App = {
       console.log("Creator: "+result.args._add);
       s.stopWatching();
     });
-    await contract.createItem( itemId, name, numOfTickets, {from:account});
+    await contract.createItem( itemId, name, numOfTickets, location, dateId, price, {from:account});
     var petTemplate = $('#petTemplate');
     var petsRow = $('#petsRow');
     petTemplate.find('.panel-title').text(name);

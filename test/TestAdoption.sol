@@ -29,6 +29,7 @@ pragma solidity ^0.5.0;
 import "truffle/Assert.sol";
 import "truffle/DeployedAddresses.sol";
 import "../contracts/Adoption.sol";
+import "../contracts/Subscription.sol";
 
 contract TestAdoption {
 
@@ -37,21 +38,34 @@ contract TestAdoption {
   );
 
  Adoption adoption = Adoption(DeployedAddresses.Adoption());// The address of the adoption contract to be tested
- string expectedPetId = "0"; // The id of the pet that will be used for testing
- uint boughtTickets = 2;
- uint totalTickets = 8;
- uint remainingTickets = 6;
- string name = "John";
- address expectedAdopter = address(this); //The expected owner of adopted pet is this contract
+ Adoption subscription = Adoption(DeployedAddresses.Subscription());
+ uint public initialBalance = 1 ether;
+ string public expectedPetId = "h1"; // The id of the pet that will be used for testing
+ uint public boughtTickets = 2;
+ uint public totalTickets = 8;
+ uint public remainingTickets = 6;
+ string public name = "John";
+ address public expectedAdopter = address(this); //The expected owner of adopted pet is this contract
+ string public expectedLocation = "loc";
+ uint public expectedDate = 20190812;
+ uint public expectedPrice = 1;
+ uint public daysToSub = 30;
+ bool public isSubscribed = true;
+
+ function testSub() public {
+   subscription.subcribe(daysToSub);
+   bool returnedSubbedStatus = adoption.isSubscribe(expectedAdopter);
+   Assert.equal(true, isSubscribed, "Creation of the expected pet should match what is returned.");
+ }
 
  function testCreateItem() public {
-   uint returnedId = adoption.createItem(expectedPetId, name, totalTickets);
+   uint returnedId = adoption.createItem(expectedPetId, name, totalTickets, expectedLocation, expectedDate, expectedPrice);
    Assert.equal(returnedId, totalTickets, "Creation of the expected pet should match what is returned.");
  }
 
  function testBuyItem() public {
-   uint returnedId = adoption.buyItem(expectedPetId, boughtTickets);
-   Assert.equal(returnedId, boughtTickets, "Adoption of the expected pet should match what is returned.");
+   uint b = adoption.buyItem.value(1)(expectedPetId, boughtTickets);
+   Assert.equal(b, boughtTickets, "Adoption of the expected pet should match what is returned.");
  }
 
  function testCheckItem() public {
@@ -70,10 +84,12 @@ contract TestAdoption {
  }
 
  function testInitialFunction() public {
-   (bytes32[] memory names, bytes32[] memory id, uint[] memory tickets) = adoption.initialFunction();
+   (bytes32[] memory names, bytes32[] memory id, uint[] memory tickets, bytes32[] memory locationList, uint[] memory dateList, uint[] memory priceList) = adoption.initialFunction();
    bytes32 returnedBytesName= names[0];
    bytes32 expectedBytesName= stringToBytes32(name);
+   uint returnedDate= dateList[0];
    Assert.equal(returnedBytesName,expectedBytesName, "The first event is not the one we have just inserted");
+   Assert.equal(returnedDate,expectedDate, "The first event is not the one we have just inserted");
  }
 
  function stringToBytes32(string memory source) public pure returns (bytes32 result) {
@@ -85,13 +101,6 @@ contract TestAdoption {
        result := mload(add(source, 32))
    }
  }
-
-
- /* // Testing the adopt() function
- function testUserCanAdoptPet() public {
-  uint returnedId = adoption.adopt(expectedPetId);
-  Assert.equal(returnedId, expectedPetId, "Adoption of the expected pet should match what is returned.");
- } */
 
   function test() public {
     Assert.equal(uint(3), uint(4), "GG");
