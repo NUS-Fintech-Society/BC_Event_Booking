@@ -128,6 +128,7 @@
     }
     console.log("Total Price: "+totalPrice);
     var ticketsAvailable = await contract.checkAvailability(itemId,{from:account});
+    ticketsAvailable = parseInt(ticketsAvailable);
     console.log("ticketsAvailable: "+ticketsAvailable+" and numOfTickets: "+numOfTickets);
     if (ticketsAvailable < numOfTickets) {
       alert("There is not enough tickets available");
@@ -138,13 +139,13 @@
       console.log("msg.sender: "+result.args._add);
       r.stopWatching();
     });
-    var passphrase = "bike game sibling crouch discover inhale forum deputy infant ivory piece jeans";
-    web3.personal.unlockAccount("0x4707CE70e400495e26664537306960B737798328", passphrase, 1000, function(error, result){
-            if(!error)
-                console.log(JSON.stringify(result));
-            else
-                console.error(error);
-        });
+    // var passphrase = "bike game sibling crouch discover inhale forum deputy infant ivory piece jeans";
+    // web3.personal.unlockAccount("0x4707CE70e400495e26664537306960B737798328", passphrase, 1000, function(error, result){
+    //         if(!error)
+    //             console.log(JSON.stringify(result));
+    //         else
+    //             console.error(error);
+    //     });
     await contract.buyItem( itemId, numOfTickets, {from:account, value:totalPrice});
     var ticketId = "ticket"+ itemId;
     document.getElementById(ticketId).innerHTML = ticketsAvailable-numOfTickets;
