@@ -80,6 +80,7 @@
       location = App.hexStringToString(location);
       date = date["c"][0];
       var newTicketId = "ticket"+ id;
+
       if (document.getElementById(newTicketId) !== null) {
         continue;
       }
